@@ -4,4 +4,6 @@ public enum SortingMethod
     /// 선택 정렬
     /// </summary>
     Selection,
+    Bubble,
+    Insert,
 }

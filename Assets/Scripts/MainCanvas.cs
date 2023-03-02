@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Diagnostics;
@@ -16,13 +17,22 @@ public class MainCanvas : MonoBehaviour
     [Header("UI")] 
     [SerializeField] private TMP_Text txtSliderValue;
     [SerializeField] private Slider rangeSlider;
+    [SerializeField] private TMP_Dropdown methodSelectDrop;
+    [SerializeField] private TMP_Dropdown speedRateDrop;
+    [SerializeField] private Button btnLaunch;
+    [SerializeField] private Button btnSet;
 
     private List<ChartItem> _chartItemList = new();
+    private SortingMethod _method = SortingMethod.Selection;
+    private List<float> _speedRates = new() { 1f, 1.5f, 5f, 10f };
+    private float _speedRate = 1f;
 
-    private void Awake()
+    private void Start()
     {
-        // ForDebug
-        // SetRandomNums(150);
+        SetMethod();
+        SetSpeedRate();
+        btnSet.onClick.AddListener(()=> SetRandomNums((int)rangeSlider.value));
+        btnLaunch.onClick.AddListener(ExecuteSort);
     }
 
     ChartItem LoadItem()
@@ -60,11 +70,15 @@ public class MainCanvas : MonoBehaviour
         }
     }
 
-    public void ExecuteSort(SortingMethod method)
+    public void ExecuteSort()
     {
-        switch (method)
+        switch (_method)
         {
             case SortingMethod.Selection:
+                break;
+            case SortingMethod.Bubble:
+                break;
+            case SortingMethod.Insert:
                 break;
         }
     }
@@ -74,6 +88,38 @@ public class MainCanvas : MonoBehaviour
     public void SetRangeValue()
     {
         txtSliderValue.text = rangeSlider.value.ToString(CultureInfo.InvariantCulture);
+    }
+
+    void SetMethod()
+    {
+        var methods = Enum.GetNames(typeof(SortingMethod));
+
+        methodSelectDrop.AddOptions(methods.ToList());
+        methodSelectDrop.value = 0;
+        methodSelectDrop.onValueChanged.AddListener((value)=>
+        {
+            var methodStr = methodSelectDrop.options[methodSelectDrop.value].text;
+
+            _method = Enum.Parse<SortingMethod>(methodStr);
+        });
+    }
+
+    void SetSpeedRate()
+    {
+        List<string> speeds = new();
+        
+        _speedRates.ForEach((rate)=> speeds.Add($"x{rate.ToString()}"));
+        
+        speedRateDrop.AddOptions(speeds);
+        speedRateDrop.value = 0;
+        speedRateDrop.onValueChanged.AddListener((value)=>OnSpeedDropValueChange(_speedRates[speedRateDrop.value]));
+    }
+
+    void OnSpeedDropValueChange(float rate)
+    {
+        _speedRate = rate;
+        
+        print(_speedRate);
     }
 
     #endregion
