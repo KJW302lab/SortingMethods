@@ -1,11 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Diagnostics;
 using UnityEngine.UI;
 
 public class MainCanvas : MonoBehaviour
@@ -42,7 +40,7 @@ public class MainCanvas : MonoBehaviour
         return go.GetComponent<ChartItem>();
     }
     
-    public void SetRandomNums(int range)
+    void SetRandomNums(int range)
     {
         var randNumList = RandomNumberGenerator.GenerateRandomNums(range);
 
@@ -70,7 +68,7 @@ public class MainCanvas : MonoBehaviour
         }
     }
 
-    public void ExecuteSort()
+    void ExecuteSort()
     {
         switch (_method)
         {
