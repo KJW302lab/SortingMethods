@@ -14,6 +14,7 @@ public class MainCanvas : MonoBehaviour
 
     [Header("UI")] 
     [SerializeField] private TMP_Text txtSliderValue;
+    [SerializeField] private TMP_Text txtSortingSteps;
     [SerializeField] private Slider rangeSlider;
     [SerializeField] private TMP_Dropdown methodSelectDrop;
     [SerializeField] private TMP_Dropdown speedRateDrop;
@@ -27,9 +28,10 @@ public class MainCanvas : MonoBehaviour
 
     private List<ChartItem> _chartItemList = new();
     private SortingMethod _method = SortingMethod.Selection;
-    private List<float> _speedRates = new() { 1f, 1.5f, 5f, 10f };
+    private List<float> _speedRates = new() { 1f, 1.5f, 5f, 10f, 40f, 80f };
     private float _speedRate = 1f;
     private GameObject _selectedModule;
+    private SortingBase _selectedMethod;
 
     private static MainCanvas _instance;
 
@@ -59,7 +61,7 @@ public class MainCanvas : MonoBehaviour
         btnLaunch.onClick.AddListener(ExecuteSort);
         SetPointerActive(false);
 
-        rangeSlider.value = 5;
+        rangeSlider.value = 40;
     }
 
     ChartItem LoadItem()
@@ -71,6 +73,11 @@ public class MainCanvas : MonoBehaviour
     
     void SetRandomNums(int range)
     {
+        if (_selectedMethod != null)
+        {
+            _selectedMethod.StopSorting();
+        }
+        
         var randNumList = RandomNumberGenerator.GenerateRandomNums(range);
 
         var chartHeight = chartRect.rect.height;
@@ -93,7 +100,7 @@ public class MainCanvas : MonoBehaviour
             var nodeWidth = chartWidth / range;
 
             var item = LoadItem();
-            item.Initialize(nodeHeight, nodeWidth, number, i);
+            item.Initialize(nodeHeight, nodeWidth, number, i, (int)rangeSlider.value);
             
             _chartItemList.Add(item);
         }
@@ -104,8 +111,10 @@ public class MainCanvas : MonoBehaviour
         if (_selectedModule != null)
         {
             Destroy(_selectedModule);
-        }
 
+            _selectedMethod = null;
+        }
+        
         var go = Instantiate(module.gameObject, transform);
         _selectedModule = go;
 
@@ -114,9 +123,9 @@ public class MainCanvas : MonoBehaviour
 
     void ExecuteSort()
     {
-        var method = LoadSortModule(methods[(int)_method]);
+        _selectedMethod = LoadSortModule(methods[(int)_method]);
         
-        method.Initialize(_chartItemList, _speedRate);
+        _selectedMethod.Initialize(_chartItemList, _speedRate);
     }
 
     #region UIControl
@@ -126,10 +135,10 @@ public class MainCanvas : MonoBehaviour
         txtSliderValue.text = rangeSlider.value.ToString(CultureInfo.InvariantCulture);
     }
 
-    public void SetPointerPosition(ChartItem item)
+    public void SetPointerPosition(Vector3 position)
     {
         SetPointerActive(true);
-        pointer.transform.SetParent(item.pointerPosition, false);
+        pointer.transform.position = position;
     }
 
     public void SetPointerSprite(bool value)
@@ -137,6 +146,11 @@ public class MainCanvas : MonoBehaviour
         int index = value ? 1 : 2;
 
         pointer.sprite = pointerSprites[index];
+    }
+
+    public void SetSteps(int step)
+    {
+        txtSortingSteps.text = $"Step : {step.ToString()}";
     }
 
     void SetMethod()
@@ -160,15 +174,9 @@ public class MainCanvas : MonoBehaviour
         _speedRates.ForEach((rate)=> speeds.Add($"x{rate.ToString()}"));
         
         speedRateDrop.AddOptions(speeds);
-        speedRateDrop.value = 0;
-        speedRateDrop.onValueChanged.AddListener((value)=>OnSpeedDropValueChange(_speedRates[speedRateDrop.value]));
-    }
-
-    void OnSpeedDropValueChange(float rate)
-    {
-        _speedRate = rate;
-        
-        print(_speedRate);
+        speedRateDrop.value = 3;
+        _speedRate = _speedRates[speedRateDrop.value];
+        speedRateDrop.onValueChanged.AddListener((value)=> _speedRate = speedRateDrop.value);
     }
 
     void SetPointerActive(bool value)

@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class ChartItem : MonoBehaviour
 {
     public RectTransform pointerPosition;
+    
     public int Number { get; private set; }
 
     private Image _img;
@@ -39,10 +40,28 @@ public class ChartItem : MonoBehaviour
             return _rect;
         }
     }
-    
+
+    private AudioSource _audio;
+
+    private AudioSource Audio
+    {
+        get
+        {
+            if (_audio == null)
+            {
+                _audio = GetComponent<AudioSource>();
+            }
+
+            return _audio;
+        }
+    }
+
     [SerializeField] private TMP_Text txtNum;
+    [SerializeField] private Image cover;
+
+    private int _range;
     
-    public void Initialize(float height, float width, int number, int index)
+    public void Initialize(float height, float width, int number, int index, int range)
     {
         Rect.anchorMin = Rect.anchorMax = Rect.pivot = Vector2.zero;
         
@@ -52,6 +71,7 @@ public class ChartItem : MonoBehaviour
         txtNum.text = number.ToString();
 
         Number = number;
+        _range = range;
     }
 
     public List<ChartItem> Switch(ChartItem other, float duration, List<ChartItem> list)
@@ -69,8 +89,21 @@ public class ChartItem : MonoBehaviour
         return list;
     }
 
+    public void PlaySound()
+    {
+        float intervalSize = (4f) / _range; // 구간의 크기 계산
+
+        Audio.pitch = 1 + (intervalSize * Number);
+        Audio.PlayOneShot(Audio.clip);
+    }
+
     public void Select(bool value)
     {
-        Img.color = value ? Color.green : Color.white;
+        Img.color = value ? Color.red : Color.white;
+    }
+
+    public void OnRightPosition()
+    {
+        cover.enabled = true;
     }
 }

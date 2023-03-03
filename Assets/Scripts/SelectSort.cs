@@ -6,13 +6,13 @@ using UnityEngine;
 public class SelectSort : SortingBase
 {
     private ChartItem _minItem;
-    private int _step = 0;
     private int _index;
 
     public override void Initialize(List<ChartItem> itemList, float speedRate)
     {
         base.Initialize(itemList, speedRate);
 
+        _index = 0;
         StartCoroutine(nameof(StartSort));
     }
 
@@ -42,6 +42,8 @@ public class SelectSort : SortingBase
                 ItemList = _minItem.Switch(ItemList[_index], 1f / SpeedRate, ItemList);
                 yield return AddStep();
             }
+            
+            _minItem.OnRightPosition();
 
             _index++;
         }
@@ -51,21 +53,5 @@ public class SelectSort : SortingBase
             SelectItem(item);
             yield return AddWait();
         }
-    }
-
-    WaitForSeconds AddStep()
-    {
-        _step++;
-        return new WaitForSeconds(1 / SpeedRate);
-    }
-
-    WaitForSeconds AddWait()
-    {
-        return new WaitForSeconds(0.5f / SpeedRate);
-    }
-
-    private void Update()
-    {
-        print($"min : {_minItem.Number}, selected : {SelectedItem.Number}");
     }
 }
