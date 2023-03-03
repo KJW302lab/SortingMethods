@@ -28,7 +28,7 @@ public class MainCanvas : MonoBehaviour
 
     private List<ChartItem> _chartItemList = new();
     private SortingMethod _method = SortingMethod.Selection;
-    private List<float> _speedRates = new() { 1f, 1.5f, 5f, 10f, 40f, 80f };
+    private List<float> _speedRates = new() { 1f, 1.5f, 5f, 15f, 40f, 80f };
     private float _speedRate = 1f;
     private GameObject _selectedModule;
     private SortingBase _selectedMethod;
@@ -176,7 +176,7 @@ public class MainCanvas : MonoBehaviour
         speedRateDrop.AddOptions(speeds);
         speedRateDrop.value = 3;
         _speedRate = _speedRates[speedRateDrop.value];
-        speedRateDrop.onValueChanged.AddListener((value)=> _speedRate = speedRateDrop.value);
+        speedRateDrop.onValueChanged.AddListener((value)=> _speedRate = _speedRates[speedRateDrop.value]);
     }
 
     void SetPointerActive(bool value)

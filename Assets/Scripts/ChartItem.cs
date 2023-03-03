@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class ChartItem : MonoBehaviour
 {
     public RectTransform pointerPosition;
+    public bool isSorted;
     
     public int Number { get; private set; }
 
@@ -57,7 +58,6 @@ public class ChartItem : MonoBehaviour
     }
 
     [SerializeField] private TMP_Text txtNum;
-    [SerializeField] private Image cover;
 
     private int _range;
     
@@ -65,7 +65,7 @@ public class ChartItem : MonoBehaviour
     {
         Rect.anchorMin = Rect.anchorMax = Rect.pivot = Vector2.zero;
         
-        Rect.sizeDelta = new Vector2(width, height);
+        Rect.sizeDelta = new Vector2(width * 0.9f, height);
         Rect.anchoredPosition = new Vector2(width * index, 0);
 
         txtNum.text = number.ToString();
@@ -97,13 +97,24 @@ public class ChartItem : MonoBehaviour
         Audio.PlayOneShot(Audio.clip);
     }
 
-    public void Select(bool value)
+    public void Select()
     {
-        Img.color = value ? Color.red : Color.white;
+        Img.color = Color.red;
+    }
+
+    public void CancelSelect()
+    {
+        Img.color = Color.white;
     }
 
     public void OnRightPosition()
     {
-        cover.enabled = true;
+        Img.color = Color.green;
+        isSorted = true;
+    }
+
+    public void PointItem()
+    {
+        MainCanvas.Instance.SetPointerPosition(pointerPosition.position);
     }
 }

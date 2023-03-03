@@ -28,21 +28,41 @@ public class SortingBase : MonoBehaviour
         set
         {
             _selectedItem = value;
-
-            foreach (var item in ItemList)
-            {
-                item.Select(item == value);
-            }
+            
+            SelectedItem.Select();
+            SelectedItem.PlaySound();
         }
     }
 
-    protected void SelectItem(ChartItem item)
+    protected void SelectItem(ChartItem item, bool needCancelOther = false)
     {
         SelectedItem = item;
-        
-        item.PlaySound();
-        
+
+        if (needCancelOther)
+        {
+            foreach (var chartItem in ItemList)
+            {
+                if (chartItem != SelectedItem && chartItem.isSorted == false)
+                {
+                    chartItem.CancelSelect();
+                }
+            }
+        }
+
         MainCanvas.Instance.SetPointerPosition(item.pointerPosition.position);
+    }
+
+    protected void CancelAllSelect()
+    {
+        foreach (var item in ItemList)
+        {
+            if (item.isSorted)
+            {
+                continue;
+            }
+            
+            item.CancelSelect();
+        }
     }
 
     public virtual void Initialize(List<ChartItem> itemList, float speedRate)
@@ -58,9 +78,9 @@ public class SortingBase : MonoBehaviour
         return new WaitForSeconds(1 / SpeedRate);
     }
     
-    protected WaitForSeconds AddWait()
+    protected WaitForSeconds AddWait(float sec)
     {
-        return new WaitForSeconds(0.5f / SpeedRate);
+        return new WaitForSeconds(sec);
     }
 
     public void StopSorting()
