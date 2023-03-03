@@ -6,8 +6,7 @@ using UnityEngine.UI;
 
 public class ChartItem : MonoBehaviour
 {
-    [SerializeField] private RectTransform pointerPosition;
-    
+    public RectTransform pointerPosition;
     public int Number { get; private set; }
 
     private Image _img;
@@ -63,10 +62,5 @@ public class ChartItem : MonoBehaviour
     public void Select(bool value)
     {
         Img.color = value ? Color.green : Color.white;
-    }
-
-    public Vector2 Point()
-    {
-        return pointerPosition.anchoredPosition;
     }
 }

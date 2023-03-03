@@ -277,5 +277,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23219e74dad6644b1a145a430662e43a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pointerPosition: {fileID: 0}
+  pointerPosition: {fileID: 8444621903985423751}
   txtNum: {fileID: 9206202773417671610}

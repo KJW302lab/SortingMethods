@@ -19,11 +19,36 @@ public class MainCanvas : MonoBehaviour
     [SerializeField] private TMP_Dropdown speedRateDrop;
     [SerializeField] private Button btnLaunch;
     [SerializeField] private Button btnSet;
+    [SerializeField] private Image pointer;
+
+    [Header("SortMethods")]
+    [SerializeField] private List<SortingBase> methods = new();
 
     private List<ChartItem> _chartItemList = new();
     private SortingMethod _method = SortingMethod.Selection;
     private List<float> _speedRates = new() { 1f, 1.5f, 5f, 10f };
     private float _speedRate = 1f;
+    private GameObject _selectedModule;
+
+    private static MainCanvas _instance;
+
+    public static MainCanvas Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = FindObjectOfType<MainCanvas>();
+
+                if (_instance == null)
+                {
+                    _instance = new GameObject { name = "MainCanvas" }.AddComponent<MainCanvas>();
+                }
+            }
+
+            return _instance;
+        }
+    }
 
     private void Start()
     {
@@ -31,6 +56,7 @@ public class MainCanvas : MonoBehaviour
         SetSpeedRate();
         btnSet.onClick.AddListener(()=> SetRandomNums((int)rangeSlider.value));
         btnLaunch.onClick.AddListener(ExecuteSort);
+        SetPointerActive(false);
     }
 
     ChartItem LoadItem()
@@ -51,7 +77,7 @@ public class MainCanvas : MonoBehaviour
         {
             foreach (var item in _chartItemList)
             {
-                Destroy(item);
+                Destroy(item.gameObject);
             }
             
             _chartItemList.Clear();
@@ -65,20 +91,29 @@ public class MainCanvas : MonoBehaviour
 
             var item = LoadItem();
             item.Initialize(nodeHeight, nodeWidth, number, i);
+            
+            _chartItemList.Add(item);
         }
+    }
+
+    SortingBase LoadSortModule(SortingBase module)
+    {
+        if (_selectedModule != null)
+        {
+            Destroy(_selectedModule);
+        }
+
+        var go = Instantiate(module.gameObject, transform);
+        _selectedModule = go;
+
+        return go.GetComponent<SortingBase>();
     }
 
     void ExecuteSort()
     {
-        switch (_method)
-        {
-            case SortingMethod.Selection:
-                break;
-            case SortingMethod.Bubble:
-                break;
-            case SortingMethod.Insert:
-                break;
-        }
+        var method = LoadSortModule(methods[(int)_method]);
+        
+        method.Initialize(_chartItemList);
     }
 
     #region UIControl
@@ -86,6 +121,12 @@ public class MainCanvas : MonoBehaviour
     public void SetRangeValue()
     {
         txtSliderValue.text = rangeSlider.value.ToString(CultureInfo.InvariantCulture);
+    }
+
+    public void SetPointer(ChartItem item)
+    {
+        SetPointerActive(true);
+        pointer.transform.SetParent(item.pointerPosition, false);
     }
 
     void SetMethod()
@@ -118,6 +159,11 @@ public class MainCanvas : MonoBehaviour
         _speedRate = rate;
         
         print(_speedRate);
+    }
+
+    void SetPointerActive(bool value)
+    {
+        pointer.enabled = value;
     }
 
     #endregion
