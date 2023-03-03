@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -53,10 +54,19 @@ public class ChartItem : MonoBehaviour
         Number = number;
     }
 
-    public void Switch(ChartItem other)
+    public List<ChartItem> Switch(ChartItem other, float duration, List<ChartItem> list)
     {
-        (Rect.anchoredPosition, other.Rect.anchoredPosition)
-            = (other.Rect.anchoredPosition, Rect.anchoredPosition);
+        Rect.DOAnchorPos(other.Rect.anchoredPosition, duration)
+            .OnStart(() => other.Rect.DOAnchorPos(Rect.anchoredPosition, duration));
+
+        var index1 = list.IndexOf(this);
+        var index2 = list.IndexOf(other);
+
+        var temp = this;
+        list[index1] = other;
+        list[index2] = temp;
+
+        return list;
     }
 
     public void Select(bool value)

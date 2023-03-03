@@ -4,6 +4,7 @@ using UnityEngine;
 public class SortingBase : MonoBehaviour
 {
     protected List<ChartItem> ItemList;
+    protected float SpeedRate;
 
     private ChartItem _selectedItem;
     protected ChartItem SelectedItem
@@ -24,11 +25,12 @@ public class SortingBase : MonoBehaviour
     {
         SelectedItem = item;
         
-        MainCanvas.Instance.SetPointer(item);
+        MainCanvas.Instance.SetPointerPosition(item);
     }
 
-    public virtual void Initialize(List<ChartItem> itemList)
+    public virtual void Initialize(List<ChartItem> itemList, float speedRate)
     {
         ItemList = itemList;
+        SpeedRate = speedRate;
     }
 }

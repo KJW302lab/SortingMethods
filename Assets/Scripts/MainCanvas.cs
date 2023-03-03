@@ -20,6 +20,7 @@ public class MainCanvas : MonoBehaviour
     [SerializeField] private Button btnLaunch;
     [SerializeField] private Button btnSet;
     [SerializeField] private Image pointer;
+    [SerializeField] private List<Sprite> pointerSprites = new();
 
     [Header("SortMethods")]
     [SerializeField] private List<SortingBase> methods = new();
@@ -57,6 +58,8 @@ public class MainCanvas : MonoBehaviour
         btnSet.onClick.AddListener(()=> SetRandomNums((int)rangeSlider.value));
         btnLaunch.onClick.AddListener(ExecuteSort);
         SetPointerActive(false);
+
+        rangeSlider.value = 5;
     }
 
     ChartItem LoadItem()
@@ -113,7 +116,7 @@ public class MainCanvas : MonoBehaviour
     {
         var method = LoadSortModule(methods[(int)_method]);
         
-        method.Initialize(_chartItemList);
+        method.Initialize(_chartItemList, _speedRate);
     }
 
     #region UIControl
@@ -123,10 +126,17 @@ public class MainCanvas : MonoBehaviour
         txtSliderValue.text = rangeSlider.value.ToString(CultureInfo.InvariantCulture);
     }
 
-    public void SetPointer(ChartItem item)
+    public void SetPointerPosition(ChartItem item)
     {
         SetPointerActive(true);
         pointer.transform.SetParent(item.pointerPosition, false);
+    }
+
+    public void SetPointerSprite(bool value)
+    {
+        int index = value ? 1 : 2;
+
+        pointer.sprite = pointerSprites[index];
     }
 
     void SetMethod()
