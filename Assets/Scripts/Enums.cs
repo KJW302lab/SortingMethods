@@ -6,4 +6,5 @@ public enum SortingMethod
     Selection,
     Bubble,
     Insert,
+    Merge,
 }

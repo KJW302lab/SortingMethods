@@ -72,10 +72,10 @@ public class SortingBase : MonoBehaviour
         Steps = 0;
     }
     
-    protected WaitForSeconds AddStep()
+    protected WaitForSeconds AddStep(float sec = 0)
     {
         Steps++;
-        return new WaitForSeconds(1 / SpeedRate);
+        return new WaitForSeconds(sec == 0 ? 1 / SpeedRate : sec);
     }
     
     protected WaitForSeconds AddWait(float sec)
