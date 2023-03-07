@@ -1,96 +1,126 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class MergeSort : SortingBase
 {
-    private int[] _originArray;
+    private List<ChartItem> _sortedList = new();
+    private List<List<ChartItem>> _listToShow = new();
+
 
     public override void Initialize(List<ChartItem> itemList, float speedRate)
     {
         base.Initialize(itemList, speedRate);
-
-        // _originArray = new [ItemList.Count];
-
-        var array = ItemList.ToArray();
-
-        foreach (var item in array)
-        {
-            // _originArray.
-        }
-
-        for (var i = 0; i < ItemList.Count; i++)
-        {
-            _originArray[i] = ItemList[i].Number;
-        }
-
-        Sort(_originArray);
-
-        foreach (var number in _originArray)
-        {
-            print(number);
-        }
         
-    }
-    
-    public void Sort(int[] array)
-    {
-        Sort(array, 0, array.Length - 1);
-    }
+        Divide(ItemList);
 
-    private void Sort(int[] array, int start, int end)
-    {
-        if (start >= end)
+        foreach (var item in _sortedList)
         {
-            return;
+            print(item.Number);
         }
 
-        int mid = (start + end) / 2;
-        Sort(array, start, mid);
-        Sort(array, mid + 1, end);
-        Merge(array, start, mid, end);
+        StartCoroutine(Show(_listToShow));
     }
 
-    void Merge(int[] array, int start, int mid, int end)
+    List<ChartItem> Divide(List<ChartItem> itemList)
     {
-        int[] temp = new int[end - start + 1];
-        int i = start;
-        int j = mid + 1;
-        int k = 0;
-
-        while (i <= mid && j <= end)
+        if (itemList == null || itemList.Count <= 1)
         {
-            if (array[i] <= array[j])
+            return itemList;
+        }
+
+        int mid = itemList.Count / 2;
+
+        List<ChartItem> leftList = new();
+        List<ChartItem> rightList = new();
+
+        for (int i = 0; i < mid; i++)
+        {
+            leftList.Add(itemList[i]);
+        }
+
+        for (int i = mid; i < itemList.Count; i++)
+        {
+            rightList.Add(itemList[i]);
+        }
+
+        leftList = Divide(leftList);
+        rightList = Divide(rightList);
+
+        return Merge(leftList, rightList);
+    }
+
+    List<ChartItem> Merge(List<ChartItem> left, List<ChartItem> right)
+    {
+        List<ChartItem> result = new List<ChartItem>();
+
+        while (left.Count > 0 || right.Count > 0)
+        {
+            if (left.Count > 0 && right.Count > 0)
             {
-                temp[k] = array[i];
-                i++;
+                List<ChartItem> items = new();
+                
+                foreach (var item in left)
+                {
+                    items.Add(item);
+                }
+                
+                foreach (var item in right)
+                {
+                    items.Add(item);
+                }
+
+                _listToShow.Add(items);
+                
+                if (left[0].Number <= right[0].Number) 
+                {
+                    AddToList(left[0]);
+                    result.Add(left[0]);
+                    left.RemoveAt(0);
+                }
+                
+                else
+                {
+                    AddToList(right[0]);
+                    result.Add(right[0]);
+                    right.RemoveAt(0);
+                }
             }
-            else
+            
+            else if (left.Count > 0) 
             {
-                temp[k] = array[j];
-                j++;
+                AddToList(left[0]);
+                result.Add(left[0]);
+                left.RemoveAt(0);
             }
-
-            k++;
+            
+            else if (right.Count > 0) 
+            {
+                AddToList(right[0]);
+                result.Add(right[0]);
+                right.RemoveAt(0);
+            }
         }
 
-        while (i <= mid)
-        {
-            temp[k] = array[i];
-            i++;
-            k++;
-        }
+        return result;
+    }
 
-        while (j <= end)
-        {
-            temp[k] = array[j];
-            j++;
-            k++;
-        }
+    void AddToList(ChartItem item)
+    {
+        _sortedList.Add(item);
+    }
 
-        for (k = 0; k < temp.Length; k++)
-        {
-            array[start + k] = temp[k];
-        }
+    IEnumerator Show(List<List<ChartItem>> showList)
+    {
+        yield return null;
+        
+        // while (true)
+        // {
+        //     if ()
+        //     {
+        //         
+        //     }
+        // }
     }
 }

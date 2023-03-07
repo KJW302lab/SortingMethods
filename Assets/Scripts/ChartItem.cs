@@ -11,6 +11,21 @@ public class ChartItem : MonoBehaviour
     public bool isSorted;
     
     public int Number { get; private set; }
+    
+    private CanvasGroup _canvasGroup;
+
+    public CanvasGroup CanvasGroup
+    {
+        get
+        {
+            if (_canvasGroup == null)
+            {
+                _canvasGroup = GetComponent<CanvasGroup>();
+            }
+
+            return _canvasGroup;
+        }
+    }
 
     private Image _img;
 
@@ -116,5 +131,17 @@ public class ChartItem : MonoBehaviour
     public void PointItem()
     {
         MainCanvas.Instance.SetPointerPosition(pointerPosition.position);
+    }
+
+    public void SetPosition(int indexToSwitch, float duration, List<ChartItem> list)
+    {
+        ChartItem itemToSwitch = list[indexToSwitch];
+
+        if (itemToSwitch == this)
+        {
+            return;
+        }
+
+        Switch(itemToSwitch, duration, list);
     }
 }
