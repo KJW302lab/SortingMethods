@@ -133,15 +133,13 @@ public class ChartItem : MonoBehaviour
         MainCanvas.Instance.SetPointerPosition(pointerPosition.position);
     }
 
-    public void SetPosition(int indexToSwitch, float duration, List<ChartItem> list)
+    public void FadeOut(float duration)
     {
-        ChartItem itemToSwitch = list[indexToSwitch];
+        CanvasGroup.DOFade(0, duration).From(1);
+    }
 
-        if (itemToSwitch == this)
-        {
-            return;
-        }
-
-        Switch(itemToSwitch, duration, list);
+    public void FadeIn(float duration)
+    {
+        CanvasGroup.DOFade(1, duration).From(0);
     }
 }
