@@ -61,7 +61,7 @@ public class MainCanvas : MonoBehaviour
         btnLaunch.onClick.AddListener(ExecuteSort);
         SetPointerActive(false);
 
-        rangeSlider.value = 5;
+        rangeSlider.value = 20;
     }
 
     ChartItem LoadItem()

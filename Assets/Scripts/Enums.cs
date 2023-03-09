@@ -7,4 +7,5 @@ public enum SortingMethod
     Bubble,
     Insert,
     Merge,
+    Quick,
 }
