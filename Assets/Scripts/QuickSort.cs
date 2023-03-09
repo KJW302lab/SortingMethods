@@ -7,10 +7,6 @@ public class QuickSort : SortingBase
 {
     private float _switchSec = 1f;
     private float _selectSec = 1f;
-
-    private ChartItem _pivot;
-    private int _high;
-    private int _low;
         
     public override void Initialize(List<ChartItem> itemList, float speedRate)
     {
@@ -19,71 +15,65 @@ public class QuickSort : SortingBase
         _switchSec /= speedRate;
         _selectSec /= speedRate;
 
-        StartCoroutine(nameof(StartQuickSort));
+        StartCoroutine(StartQuickSort(ItemList));
     }
 
-    IEnumerator StartQuickSort()
+    IEnumerator StartQuickSort(List<ChartItem> list)
     {
-        _pivot = ItemList[Random.Range(0, ItemList.Count)];
+        var pivot = list.Count / 2;
         
-        SelectItem(_pivot);
-        yield return AddStep(_selectSec);
+        SelectItem(list[pivot]);
+        yield return AddStep(0.5f);
 
-        _pivot.Switch(ItemList[^1], _switchSec, ItemList);
-        yield return AddStep(_switchSec);
-        
-        CancelAllSelect();
+        int low = 0;
+        int high = list.Count - 1;
 
-        _low = 0;
-        _high = ItemList.Count - 2;
-        
-        SelectItem(ItemList[_low]);
-        SelectItem(ItemList[_high]);
-        yield return AddStep(_selectSec);
-
-        while (true)
+        while (low < high)
         {
+            print($"low {low} high {high} pivot {pivot}");
+            
             yield return null;
             
-            if (ItemList[_low].Number < _pivot.Number)
+            SelectItem(list[low]);
+            SelectItem(list[high]);
+            
+            if (list[low].Number < list[pivot].Number && low < pivot - 1)
             {
-                ItemList[_low].CancelSelect();
-                
-                _low++;
-                SelectItem(ItemList[_low]);
+                list[low].CancelSelect();
+                low++;
+                SelectItem(list[low]);
                 yield return AddStep(_selectSec);
             }
-
-            if (ItemList[_high].Number >= _pivot.Number)
+            else if (list[high].Number > list[pivot].Number && high > pivot + 1)
             {
-                ItemList[_high].CancelSelect();
-                
-                _high--;
-                SelectItem(ItemList[_high]);
+                list[high].CancelSelect();
+                high--;
+                SelectItem(list[high]);
                 yield return AddStep(_selectSec);
             }
             else
             {
-                ItemList[_high].Switch(ItemList[_low], _switchSec, ItemList);
-                yield return AddStep(_switchSec);
-            }
+                if (low < high)
+                {
+                    list[low].Switch(list[high], _switchSec, ItemList);
+                    
+                    list[low].CancelSelect();
+                    low++;
+                    SelectItem(list[low]);
 
-            if (_low >= _high)
-            {
-                ItemList[_high].Switch(_pivot, _switchSec, ItemList);
-                _pivot = ItemList[^1];
-                _low = 0;
-                _high = ItemList.Count - 2;
-                yield return AddStep(_switchSec);
+                    list[high].CancelSelect();
+                    high--;
+                    SelectItem(list[high]);
+                    
+                    yield return AddStep(_switchSec);
+                }
+                else
+                {
+                    
+                }
             }
         }
-    }
 
-    private void Update()
-    {
-        if (_pivot != null)
-        {
-            print($"high : {_high} low : {_low} pivot : {_pivot.Number}");
-        }
     }
+    
 }
