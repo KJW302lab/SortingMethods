@@ -1,79 +1,84 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Random = UnityEngine.Random;
+using System.Linq;
+using UnityEngine;
 
 public class QuickSort : SortingBase
 {
     private float _switchSec = 1f;
     private float _selectSec = 1f;
-        
+    private bool _jobFinished;
+    private List<ChartItem> _sorted;
+
     public override void Initialize(List<ChartItem> itemList, float speedRate)
     {
         base.Initialize(itemList, speedRate);
 
         _switchSec /= speedRate;
         _selectSec /= speedRate;
+        _jobFinished = false;
 
-        StartCoroutine(StartQuickSort(ItemList));
+        _sorted = new();
+
+        _sorted = ItemList.OrderBy(item => item.Number).ToList();
+
+        StartCoroutine(StartSorting());
     }
 
-    IEnumerator StartQuickSort(List<ChartItem> list)
+    IEnumerator StartSorting()
     {
-        var pivot = list.Count / 2;
-        
-        SelectItem(list[pivot]);
-        yield return AddStep(0.5f);
+        StartCoroutine(QuickSorting(ItemList));
 
-        int low = 0;
-        int high = list.Count - 1;
+        yield return new WaitUntil(() => ItemList.Count <= 1);
 
-        while (low < high)
+        foreach (var item in _sorted)
         {
-            print($"low {low} high {high} pivot {pivot}");
-            
-            yield return null;
-            
-            SelectItem(list[low]);
-            SelectItem(list[high]);
-            
-            if (list[low].Number < list[pivot].Number && low < pivot - 1)
-            {
-                list[low].CancelSelect();
-                low++;
-                SelectItem(list[low]);
-                yield return AddStep(_selectSec);
-            }
-            else if (list[high].Number > list[pivot].Number && high > pivot + 1)
-            {
-                list[high].CancelSelect();
-                high--;
-                SelectItem(list[high]);
-                yield return AddStep(_selectSec);
-            }
-            else
-            {
-                if (low < high)
-                {
-                    list[low].Switch(list[high], _switchSec, ItemList);
-                    
-                    list[low].CancelSelect();
-                    low++;
-                    SelectItem(list[low]);
+            item.OnRightPosition();
+            item.PlaySound();
+            item.PointItem();
+            yield return AddWait(0.1f);
+        }
+    }
 
-                    list[high].CancelSelect();
-                    high--;
-                    SelectItem(list[high]);
-                    
-                    yield return AddStep(_switchSec);
-                }
-                else
-                {
-                    
-                }
+    IEnumerator QuickSorting(List<ChartItem> list)
+    {
+        if (list.Count <= 1)
+        {
+            yield break;
+        }
+        
+        int pivot = 0;
+
+        int stored = pivot + 1;
+
+        SelectItem(list[pivot]);
+        yield return AddStep(_selectSec);
+        
+        for (int i = pivot + 1; i < list.Count; i++)
+        {
+            SelectItem(list[i]);
+            yield return AddStep(_selectSec);
+            
+            if (list[i].Number < list[pivot].Number)
+            {
+                list[i].Switch(list[stored], _switchSec, ItemList);
+
+                stored++;
+                
+                yield return AddStep(_switchSec);
             }
+            
+            CancelAllSelect();
+            SelectItem(list[pivot]);
         }
 
+        list[pivot].Switch(list[stored - 1], _switchSec, ItemList);
+        yield return AddStep(_switchSec);
+        
+        list[stored - 1].OnRightPosition();
+        list.Remove(list[stored - 1]);
+
+        StartCoroutine(QuickSorting(list));
     }
-    
 }

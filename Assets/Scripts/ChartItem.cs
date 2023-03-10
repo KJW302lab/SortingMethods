@@ -91,6 +91,11 @@ public class ChartItem : MonoBehaviour
 
     public List<ChartItem> Switch(ChartItem other, float duration, List<ChartItem> list)
     {
+        if (other == this)
+        {
+            return list;
+        }
+        
         Rect.DOAnchorPos(other.Rect.anchoredPosition, duration)
             .OnStart(() => other.Rect.DOAnchorPos(Rect.anchoredPosition, duration));
 

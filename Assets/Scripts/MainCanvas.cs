@@ -27,7 +27,7 @@ public class MainCanvas : MonoBehaviour
     [SerializeField] private List<SortingBase> methods = new();
 
     private List<ChartItem> _chartItemList = new();
-    private SortingMethod _method = SortingMethod.Quick;
+    private SortingMethod _method = SortingMethod.Selection;
     private List<float> _speedRates = new() { 1f, 1.5f, 5f, 15f, 40f, 80f };
     private float _speedRate = 1f;
     private GameObject _selectedModule;
@@ -58,10 +58,11 @@ public class MainCanvas : MonoBehaviour
         SetMethod();
         SetSpeedRate();
         btnSet.onClick.AddListener(()=> SetRandomNums((int)rangeSlider.value));
+        // btnSet.onClick.AddListener(SetSpecificList);
         btnLaunch.onClick.AddListener(ExecuteSort);
         SetPointerActive(false);
 
-        rangeSlider.value = 20;
+        rangeSlider.value = 40;
     }
 
     ChartItem LoadItem()
@@ -69,6 +70,41 @@ public class MainCanvas : MonoBehaviour
         var go = Instantiate(chartItem.gameObject, chartRect, false);
 
         return go.GetComponent<ChartItem>();
+    }
+
+    void SetSpecificList()
+    {
+        if (_selectedMethod != null)
+        {
+            _selectedMethod.StopSorting();
+        }
+        
+        if (_chartItemList.Count > 0)
+        {
+            foreach (var item in _chartItemList)
+            {
+                Destroy(item.gameObject);
+            }
+            
+            _chartItemList.Clear();
+        }
+
+        List<int> list = new List<int>(){9, 3, 8, 5, 1, 7, 6, 4, 2};
+        
+        var chartHeight = chartRect.rect.height;
+        var chartWidth = chartRect.rect.width;
+
+        for (var i = 0; i < list.Count; i++)
+        {
+            var number = list[i];
+            var nodeHeight = chartHeight / list.Count * number;
+            var nodeWidth = chartWidth / list.Count;
+
+            var item = LoadItem();
+            item.Initialize(nodeHeight, nodeWidth, number, i, (int)rangeSlider.value);
+            
+            _chartItemList.Add(item);
+        }
     }
     
     void SetRandomNums(int range)
@@ -158,7 +194,7 @@ public class MainCanvas : MonoBehaviour
         var methods = Enum.GetNames(typeof(SortingMethod));
 
         methodSelectDrop.AddOptions(methods.ToList());
-        methodSelectDrop.value = 4;
+        methodSelectDrop.value = 0;
         methodSelectDrop.onValueChanged.AddListener((value)=>
         {
             var methodStr = methodSelectDrop.options[methodSelectDrop.value].text;
@@ -174,7 +210,7 @@ public class MainCanvas : MonoBehaviour
         _speedRates.ForEach((rate)=> speeds.Add($"x{rate.ToString()}"));
         
         speedRateDrop.AddOptions(speeds);
-        speedRateDrop.value = 0;
+        speedRateDrop.value = 3;
         _speedRate = _speedRates[speedRateDrop.value];
         speedRateDrop.onValueChanged.AddListener((value)=> _speedRate = _speedRates[speedRateDrop.value]);
     }
