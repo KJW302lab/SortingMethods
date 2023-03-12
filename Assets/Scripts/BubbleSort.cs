@@ -49,7 +49,7 @@ public class BubbleSort : SortingBase
             item.OnRightPosition();
             item.PlaySound();
             item.PointItem();
-            yield return AddWait(0.1f);
+            yield return AddWait(0.1f / SpeedRate);
         }
     }
 }

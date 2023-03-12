@@ -24,7 +24,7 @@ public class InsertSort : SortingBase
             var key = ItemList[_index];
             var prev = ItemList[_index - 1];
             SelectItem(key);
-            yield return AddWait(0.3f);
+            yield return AddWait(1f / SpeedRate);
             SelectItem(prev);
             yield return AddStep();
 
@@ -47,7 +47,7 @@ public class InsertSort : SortingBase
             item.OnRightPosition();
             item.PlaySound();
             item.PointItem();
-            yield return AddWait(0.1f);
+            yield return AddWait(0.1f / SpeedRate);
         }
     }
 }

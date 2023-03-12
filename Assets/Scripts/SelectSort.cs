@@ -27,7 +27,7 @@ public class SelectSort : SortingBase
             for (int i = _index; i < ItemList.Count; i++)
             {
                 SelectItem(ItemList[i], true);
-                yield return AddStep();
+                yield return AddStep(1 / SpeedRate);
 
                 if (SelectedItem.Number < _minItem.Number)
                 {
@@ -36,13 +36,12 @@ public class SelectSort : SortingBase
             }
             
             SelectItem(_minItem, true);
-            yield return AddWait(1);
+            yield return AddWait(1 / SpeedRate);
 
             if (ItemList[_index] != _minItem)
             {
-                ItemList = _minItem.Switch(ItemList[_index], 0.5f, ItemList);
-                yield return AddStep();
-                yield return AddWait(0.5f);
+                ItemList = _minItem.Switch(ItemList[_index], 1 / SpeedRate, ItemList);
+                yield return AddStep(1 / SpeedRate);
             }
             
             _minItem.OnRightPosition();
@@ -55,7 +54,7 @@ public class SelectSort : SortingBase
             item.OnRightPosition();
             item.PlaySound();
             item.PointItem();
-            yield return AddWait(0.1f);
+            yield return AddWait(0.1f / SpeedRate);
         }
     }
 }
