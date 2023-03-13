@@ -27,7 +27,7 @@ public class MainCanvas : MonoBehaviour
     [SerializeField] private List<SortingBase> methods = new();
 
     private List<ChartItem> _chartItemList = new();
-    private SortingMethod _method = SortingMethod.Quick;
+    private SortingMethod _method = SortingMethod.Selection;
     private List<float> _speedRates = new() { 1f, 5f, 15f, 40f, 80f, 150f };
     private float _speedRate = 1f;
     private GameObject _selectedModule;
@@ -62,7 +62,7 @@ public class MainCanvas : MonoBehaviour
         btnLaunch.onClick.AddListener(ExecuteSort);
         SetPointerActive(false);
 
-        rangeSlider.value = 15;
+        rangeSlider.value = 50;
     }
 
     ChartItem LoadItem()
@@ -194,7 +194,7 @@ public class MainCanvas : MonoBehaviour
         var methods = Enum.GetNames(typeof(SortingMethod));
 
         methodSelectDrop.AddOptions(methods.ToList());
-        methodSelectDrop.value = 4;
+        methodSelectDrop.value = 0;
         methodSelectDrop.onValueChanged.AddListener((value)=>
         {
             var methodStr = methodSelectDrop.options[methodSelectDrop.value].text;
@@ -210,7 +210,7 @@ public class MainCanvas : MonoBehaviour
         _speedRates.ForEach((rate)=> speeds.Add($"x{rate.ToString()}"));
         
         speedRateDrop.AddOptions(speeds);
-        speedRateDrop.value = 0;
+        speedRateDrop.value = 3;
         _speedRate = _speedRates[speedRateDrop.value];
         speedRateDrop.onValueChanged.AddListener((value)=> _speedRate = _speedRates[speedRateDrop.value]);
     }

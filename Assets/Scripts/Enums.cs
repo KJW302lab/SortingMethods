@@ -8,4 +8,6 @@ public enum SortingMethod
     Insert,
     Merge,
     Quick,
+    Radix,
+    Heap,
 }
