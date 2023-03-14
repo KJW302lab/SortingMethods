@@ -54,6 +54,8 @@ public class QuickSort : SortingBase
             yield break;
         }
 
+        // 리스트 중 하나의 요소를 pivot으로 정하고, 리스트의 맨 처음 요소나 맨 마지막 요소와 Swap.
+        // 리스트의 맨 처음 요소를 left로 정하고, 마지막 요소를 right으로 정함.
         int left = 1;
         int right = list.Count - 1;
 
@@ -68,6 +70,7 @@ public class QuickSort : SortingBase
 
         while (true)
         {
+            // left와 right이 교차되었을때, pivot과 right를 swap하고 pivot을 기준으로 2개의 리스트를 새로 만들어(Divide) 각각을 Quick 정렬함
             if (left > right)
             {
                 list[pivot].Switch(list[right], _switchSec, list);
@@ -97,18 +100,21 @@ public class QuickSort : SortingBase
             SelectItem(list[right]);
             yield return AddStep(_selectSec);
 
+            // left가 pivot보다 작다면, left의 인덱스를 올림
             if (list[left].Number < list[pivot].Number)
             {
                 list[left].CancelSelect();
                 left++;
             }
 
+            // right가 pivot보다 작다면, right 인덱스를 내림
             else if (list[right].Number > list[pivot].Number)
             {
                 list[right].CancelSelect();
                 right--;
             }
 
+            // left와 right가 멈추었다면, 둘을 swap하고 각각의 iterator를 진행시킨다
             else
             {
                 list[left].Switch(list[right], _switchSec, list);
