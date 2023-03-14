@@ -80,7 +80,7 @@ public class ChartItem : MonoBehaviour
     {
         Rect.anchorMin = Rect.anchorMax = Rect.pivot = Vector2.zero;
         
-        Rect.sizeDelta = new Vector2(width * 0.9f, height);
+        Rect.sizeDelta = new Vector2(width, height);
         Rect.anchoredPosition = new Vector2(width * index, 0);
 
         txtNum.text = number.ToString();

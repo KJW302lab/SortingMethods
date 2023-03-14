@@ -145,8 +145,8 @@ public class MergeSort : SortingBase
 
             foreach (var item in itemsToSort)
             {
-                item.FadeOut(1 / SpeedRate);
-                yield return AddWait(1 / SpeedRate);
+                item.FadeOut(0.1f / SpeedRate);
+                yield return AddWait(0.1f / SpeedRate);
             }
             
             var sorted = itemsToSort.OrderBy(item => item.Number).ToList();

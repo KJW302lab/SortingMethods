@@ -8,78 +8,74 @@ public class HeapSort : SortingBase
 {
     private float _selectSec;
     private float _switchSec;
-    private ChartItem[] _heap;
-    private int _index;
+    private int _max;
     
     public override void Initialize(List<ChartItem> itemList, float speedRate)
     {
         base.Initialize(itemList, speedRate);
-
-        _heap = ItemList.ToArray();
-        _index = ItemList.Count / 2 - 1;
+            
         _selectSec = 1 / SpeedRate;
         _switchSec = 1 / SpeedRate;
+
+        _max = ItemList.OrderBy(item => item.Number).ToList()[^1].Number;
 
         StartCoroutine(StartSort());
     }
 
     IEnumerator StartSort()
     {
-        while (_index > 0)
+        for (int i = ItemList.Count / 2 - 1; i >= 0; i--)
         {
-            yield return null;
+            yield return StartCoroutine(Heapify(ItemList.Count, i));
+        }
+        
+        for (int i = ItemList.Count - 1; i >= 0; i--)
+        {
+            SelectItem(ItemList[i]);
+            SelectItem(ItemList[0]);
             
-            var leaf = ItemList[_index];
-            var root = ItemList[0];
-            
-            SelectItem(leaf);
-            SelectItem(root);
-
-            leaf.Switch(root, _switchSec, ItemList);
-
+            ItemList[i].Switch(ItemList[0], _switchSec, ItemList);
             yield return AddStep(_switchSec);
+            yield return StartCoroutine(Heapify(i, 0));
+        }
 
-            yield return StartCoroutine(Heapify(leaf));
-
-            _index--;
+        foreach (var item in ItemList)
+        {
+            item.OnRightPosition();
+            item.PlaySound();
+            item.PointItem();
+            yield return AddWait(0.1f / SpeedRate);
         }
     }
 
-    IEnumerator Heapify(ChartItem parent)
+    IEnumerator Heapify(int count, int idx)
     {
-        var largest = ItemList.IndexOf(parent);
-
-        var leftIndex = largest * 2 + 1;
-        var rightIndex = leftIndex + 1;
-
-        ChartItem left = null;
-        ChartItem right = null;
-
-        if (leftIndex < ItemList.Count)
-        {
-            left = ItemList[leftIndex];
-        }
+        CancelAllSelect();
         
-        if (leftIndex < ItemList.Count)
-        {
-            right = ItemList[rightIndex];
-        }
+        var largest = idx;
 
-        if (left != null && left.Number > ItemList[largest].Number)
+        var leftIndex = idx * 2 + 1;
+        var rightIndex = idx * 2 + 2;
+
+        if (leftIndex < count && ItemList[leftIndex].Number > ItemList[largest].Number)
         {
             largest = leftIndex;
         }
         
-        if (right != null && right.Number > ItemList[largest].Number)
+        if (rightIndex < count && ItemList[rightIndex].Number > ItemList[largest].Number)
         {
+            
             largest = rightIndex;
         }
 
-        if (ItemList.IndexOf(parent) != largest)
+        if (idx != largest)
         {
-            parent.Switch(ItemList[largest], _switchSec, ItemList);
+            SelectItem(ItemList[idx]);
+            SelectItem(ItemList[largest]);
+            
+            ItemList[idx].Switch(ItemList[largest], _switchSec, ItemList);
             yield return AddStep(_switchSec);
-            yield return StartCoroutine(Heapify(ItemList[largest]));
+            yield return StartCoroutine(Heapify(count, largest));
         }
     }
 }

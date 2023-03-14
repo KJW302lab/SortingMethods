@@ -28,7 +28,7 @@ public class MainCanvas : MonoBehaviour
 
     private List<ChartItem> _chartItemList = new();
     private SortingMethod _method = SortingMethod.Selection;
-    private List<float> _speedRates = new() { 1f, 5f, 15f, 40f, 80f, 150f };
+    private List<float> _speedRates = new() { 1f, 5f, 15f, 40f, 80f, 150f, 500f };
     private float _speedRate = 1f;
     private GameObject _selectedModule;
     private SortingBase _selectedMethod;
