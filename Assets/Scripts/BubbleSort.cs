@@ -12,10 +12,10 @@ public class BubbleSort : SortingBase
 
         _count = 1;
 
-        StartCoroutine(nameof(StartSort));
+        StartCoroutine(nameof(StartBubbleSort));
     }
 
-    IEnumerator StartSort()
+    IEnumerator StartBubbleSort()
     {
         while (_count < ItemList.Count)
         {
@@ -26,30 +26,20 @@ public class BubbleSort : SortingBase
                 var first = ItemList[i];
                 var second = ItemList[i + 1];
                 
-                SelectItem(first);
-                SelectItem(second);
-                yield return AddStep();
+                yield return SelectItem(first);
+                yield return SelectItem(second);
                 
                 if (first.Number > second.Number)
                 {
-                    first.Switch(second, 1f / SpeedRate, ItemList);
-                    yield return AddStep();
+                    yield return SwapItem(first, second);
                 }
                 
                 CancelAllSelect();
             }
-            
-            ItemList[^_count].OnRightPosition();
 
             _count++;
         }
 
-        foreach (var item in ItemList)
-        {
-            item.OnRightPosition();
-            item.PlaySound();
-            item.PointItem();
-            yield return AddWait(0.1f / SpeedRate);
-        }
+        OnSortComplete();
     }
 }

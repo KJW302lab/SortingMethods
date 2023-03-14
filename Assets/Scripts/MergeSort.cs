@@ -153,17 +153,15 @@ public class MergeSort : SortingBase
             foreach (var number in numbers)
             {
                 var item = GetItem(number);
-                
-                SelectItem(item);
-                yield return AddStep(1 / SpeedRate);
+
+                yield return SelectItem(item);
                 
                 itemsToSort.Add(item);
             }
 
             foreach (var item in itemsToSort)
             {
-                item.FadeOut(0.1f / SpeedRate);
-                yield return AddWait(0.1f / SpeedRate);
+                yield return item.FadeOut(ProcessSec);
             }
             
             var sorted = itemsToSort.OrderBy(item => item.Number).ToList();
@@ -180,8 +178,7 @@ public class MergeSort : SortingBase
             for (var i = 0; i < sorted.Count; i++)
             {
                 sorted[i].Rect.anchoredPosition = orderByX[i];
-                sorted[i].FadeIn(1 / SpeedRate);
-                yield return AddWait(1 / SpeedRate);
+                yield return sorted[i].FadeIn(ProcessSec);
             }
 
             CancelAllSelect();

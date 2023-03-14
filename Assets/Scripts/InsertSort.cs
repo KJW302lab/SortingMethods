@@ -12,10 +12,10 @@ public class InsertSort : SortingBase
 
         _index = 1;
 
-        StartCoroutine(nameof(StartSort));
+        StartCoroutine(nameof(StartInsertSort));
     }
 
-    IEnumerator StartSort()
+    IEnumerator StartInsertSort()
     {
         while (_index < ItemList.Count)
         {
@@ -23,17 +23,15 @@ public class InsertSort : SortingBase
 
             var key = ItemList[_index];
             var prev = ItemList[_index - 1];
-            SelectItem(key);
-            yield return AddWait(1f / SpeedRate);
-            SelectItem(prev);
-            yield return AddStep();
+            
+            yield return SelectItem(key);
+            yield return SelectItem(prev);
 
             for (int i = ItemList.IndexOf(key); i >= 1; i--)
             {
                 if (ItemList[i].Number < ItemList[i - 1].Number)
                 {
-                    ItemList[i].Switch(ItemList[i - 1], 1f / SpeedRate, ItemList);
-                    yield return AddStep();
+                    yield return SwapItem(ItemList[i], ItemList[i - 1]);
                 }
             }
 
@@ -42,12 +40,6 @@ public class InsertSort : SortingBase
             _index++;
         }
         
-        foreach (var item in ItemList)
-        {
-            item.OnRightPosition();
-            item.PlaySound();
-            item.PointItem();
-            yield return AddWait(0.1f / SpeedRate);
-        }
+        OnSortComplete();
     }
 }

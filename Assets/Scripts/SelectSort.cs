@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class SelectSort : SortingBase
 {
+    private float _selectSec;
     private ChartItem _minItem;
     private int _index;
 
@@ -13,10 +14,10 @@ public class SelectSort : SortingBase
         base.Initialize(itemList, speedRate);
 
         _index = 0;
-        StartCoroutine(nameof(StartSort));
+        StartCoroutine(nameof(StartSelectSort));
     }
 
-    IEnumerator StartSort()
+    IEnumerator StartSelectSort()
     {
         while (_index < ItemList.Count)
         {
@@ -26,8 +27,7 @@ public class SelectSort : SortingBase
 
             for (int i = _index; i < ItemList.Count; i++)
             {
-                SelectItem(ItemList[i], true);
-                yield return AddStep(1 / SpeedRate);
+                yield return SelectItem(ItemList[i], true, true);
 
                 if (SelectedItem.Number < _minItem.Number)
                 {
@@ -35,26 +35,16 @@ public class SelectSort : SortingBase
                 }
             }
             
-            SelectItem(_minItem, true);
-            yield return AddWait(1 / SpeedRate);
+            SelectItem(_minItem, false, true);
 
             if (ItemList[_index] != _minItem)
             {
-                ItemList = _minItem.Switch(ItemList[_index], 1 / SpeedRate, ItemList);
-                yield return AddStep(1 / SpeedRate);
+                SwapItem(_minItem, ItemList[_index]);
             }
-            
-            _minItem.OnRightPosition();
 
             _index++;
         }
 
-        foreach (var item in ItemList)
-        {
-            item.OnRightPosition();
-            item.PlaySound();
-            item.PointItem();
-            yield return AddWait(0.1f / SpeedRate);
-        }
+        OnSortComplete();
     }
 }

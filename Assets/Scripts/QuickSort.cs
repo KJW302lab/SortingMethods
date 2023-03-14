@@ -45,7 +45,7 @@ public class QuickSort : SortingBase
 
     IEnumerator QuickSorting(List<ChartItem> list)
     {
-        if (list.Count <= 1)
+        if (list == null || list.Count <= 1)
         {
             yield break;
         }
@@ -57,22 +57,20 @@ public class QuickSort : SortingBase
 
         int pivot = list.Count / 2;
         
-        SelectItem(list[pivot]);
-        yield return AddStep(_selectSec);
-        
-        list[pivot].Switch(list[0], _switchSec, list);
+        yield return SelectItem(list[pivot]);
+
+        SwapItem(list[pivot], list[0], list);
+        yield return AddStep(ProcessSec);
         pivot = 0;
-        yield return AddStep(_switchSec);
 
         while (true)
         {
             // left와 right이 교차되었을때, pivot과 right를 swap하고 pivot을 기준으로 2개의 리스트를 새로 만들어(Divide) 각각을 Quick 정렬함
             if (left > right)
             {
-                list[pivot].Switch(list[right], _switchSec, list);
+                SwapItem(list[pivot], list[right], list);
                 pivot = right;
-                
-                yield return AddStep(_switchSec);
+                yield return AddStep(ProcessSec);
 
                 List<ChartItem> leftList = new();
                 List<ChartItem> rightList = new();
@@ -93,17 +91,16 @@ public class QuickSort : SortingBase
             }
             
             SelectItem(list[left]);
-            SelectItem(list[right]);
-            yield return AddStep(_selectSec);
+            yield return SelectItem(list[right]);
 
-            // left가 pivot보다 작다면, left의 인덱스를 올림
+            // left가 pivot보다 작다면, left의 인덱스 +
             if (list[left].Number < list[pivot].Number)
             {
                 list[left].CancelSelect();
                 left++;
             }
 
-            // right가 pivot보다 작다면, right 인덱스를 내림
+            // right가 pivot보다 작다면,
             else if (list[right].Number > list[pivot].Number)
             {
                 list[right].CancelSelect();
@@ -113,15 +110,15 @@ public class QuickSort : SortingBase
             // left와 right가 멈추었다면, 둘을 swap하고 각각의 iterator를 진행시킨다
             else
             {
-                list[left].Switch(list[right], _switchSec, list);
+                SwapItem(list[left], list[right], list);
                 
                 list[left].CancelSelect();
                 list[right].CancelSelect();
 
                 left++;
                 right--;
-
-                yield return AddStep(_switchSec);
+                
+                yield return AddStep(ProcessSec);
             }
         }
     }

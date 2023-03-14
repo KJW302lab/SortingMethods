@@ -6,23 +6,14 @@ using UnityEngine;
 
 public class HeapSort : SortingBase
 {
-    private float _selectSec;
-    private float _switchSec;
-    private int _max;
-    
     public override void Initialize(List<ChartItem> itemList, float speedRate)
     {
         base.Initialize(itemList, speedRate);
-            
-        _selectSec = 1 / SpeedRate;
-        _switchSec = 1 / SpeedRate;
 
-        _max = ItemList.OrderBy(item => item.Number).ToList()[^1].Number;
-
-        StartCoroutine(StartSort());
+        StartCoroutine(StartHeapSort());
     }
 
-    IEnumerator StartSort()
+    IEnumerator StartHeapSort()
     {
         for (int i = ItemList.Count / 2 - 1; i >= 0; i--)
         {
@@ -32,20 +23,14 @@ public class HeapSort : SortingBase
         for (int i = ItemList.Count - 1; i >= 0; i--)
         {
             SelectItem(ItemList[i]);
-            SelectItem(ItemList[0]);
+            yield return SelectItem(ItemList[0]);
+
+            yield return SwapItem(ItemList[i], ItemList[0]);
             
-            ItemList[i].Switch(ItemList[0], _switchSec, ItemList);
-            yield return AddStep(_switchSec);
             yield return StartCoroutine(Heapify(i, 0));
         }
 
-        foreach (var item in ItemList)
-        {
-            item.OnRightPosition();
-            item.PlaySound();
-            item.PointItem();
-            yield return AddWait(0.1f / SpeedRate);
-        }
+        OnSortComplete();
     }
 
     IEnumerator Heapify(int count, int idx)
@@ -71,10 +56,8 @@ public class HeapSort : SortingBase
         if (idx != largest)
         {
             SelectItem(ItemList[idx]);
-            SelectItem(ItemList[largest]);
-            
-            ItemList[idx].Switch(ItemList[largest], _switchSec, ItemList);
-            yield return AddStep(_switchSec);
+            yield return SelectItem(ItemList[largest]);
+            yield return SwapItem(ItemList[idx], ItemList[largest]);
             yield return StartCoroutine(Heapify(count, largest));
         }
     }

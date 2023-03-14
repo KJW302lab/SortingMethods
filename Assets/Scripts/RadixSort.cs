@@ -35,10 +35,10 @@ public class RadixSort : SortingBase
         _selectSec = 1 / SpeedRate;
         _switchSec = 1 / SpeedRate;
 
-        StartCoroutine(StartSort());
+        StartCoroutine(StartRadixSort());
     }
 
-    IEnumerator StartSort()
+    IEnumerator StartRadixSort()
     {
         while (_round <= _maxNum)
         {
@@ -46,8 +46,7 @@ public class RadixSort : SortingBase
             
             foreach (var item in ItemList)
             {
-                SelectItem(item);
-                yield return AddStep(_selectSec);
+                yield return SelectItem(item);
                 
                 int number = item.Number;
 
@@ -63,11 +62,9 @@ public class RadixSort : SortingBase
                 while (_bucket[i].Count > 0)
                 {
                     var item = _bucket[i].Dequeue();
-                
-                    item.Switch(ItemList[_slotIndex], _switchSec, ItemList);
-                    _slotIndex++;
 
-                    yield return AddStep(_switchSec);   
+                    yield return SwapItem(item, ItemList[_slotIndex]);
+                    _slotIndex++;
                 }
             }
             
@@ -75,12 +72,6 @@ public class RadixSort : SortingBase
             _round *= 10;
         }
 
-        foreach (var item in ItemList)
-        {
-            item.OnRightPosition();
-            item.PlaySound();
-            item.PointItem();
-            yield return AddWait(_selectSec);
-        }
+        OnSortComplete();
     }
 }

@@ -89,26 +89,6 @@ public class ChartItem : MonoBehaviour
         _range = range;
     }
 
-    public List<ChartItem> Switch(ChartItem other, float duration, List<ChartItem> list)
-    {
-        if (other == this)
-        {
-            return list;
-        }
-        
-        Rect.DOAnchorPos(other.Rect.anchoredPosition, duration)
-            .OnStart(() => other.Rect.DOAnchorPos(Rect.anchoredPosition, duration));
-
-        var index1 = list.IndexOf(this);
-        var index2 = list.IndexOf(other);
-
-        var temp = this;
-        list[index1] = other;
-        list[index2] = temp;
-
-        return list;
-    }
-
     public void PlaySound()
     {
         float intervalSize = (4f) / _range; // 구간의 크기 계산
@@ -138,13 +118,17 @@ public class ChartItem : MonoBehaviour
         MainCanvas.Instance.SetPointerPosition(pointerPosition.position);
     }
 
-    public void FadeOut(float duration)
+    public WaitForSeconds FadeOut(float duration)
     {
         CanvasGroup.DOFade(0, duration).From(1);
+
+        return new WaitForSeconds(duration);
     }
 
-    public void FadeIn(float duration)
+    public WaitForSeconds FadeIn(float duration)
     {
         CanvasGroup.DOFade(1, duration).From(0);
+
+        return new WaitForSeconds(duration);
     }
 }

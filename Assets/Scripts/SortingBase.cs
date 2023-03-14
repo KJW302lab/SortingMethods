@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class SortingBase : MonoBehaviour
@@ -20,6 +22,7 @@ public class SortingBase : MonoBehaviour
     
     protected List<ChartItem> ItemList;
     protected float SpeedRate;
+    protected float ProcessSec;
 
     private ChartItem _selectedItem;
     protected ChartItem SelectedItem
@@ -34,7 +37,7 @@ public class SortingBase : MonoBehaviour
         }
     }
 
-    protected void SelectItem(ChartItem item, bool needCancelOther = false)
+    protected WaitForSeconds SelectItem(ChartItem item, bool addStep = true, bool needCancelOther = false)
     {
         SelectedItem = item;
 
@@ -50,6 +53,60 @@ public class SortingBase : MonoBehaviour
         }
 
         MainCanvas.Instance.SetPointerPosition(item.pointerPosition.position);
+
+        if (addStep)
+        {
+            Steps++;
+        }
+
+        return new WaitForSeconds(ProcessSec);
+    }
+
+    protected WaitForSeconds SwapItem(ChartItem origin, ChartItem other)
+    {
+        if (origin == other)
+        {
+            return null;
+        }
+
+        int originIdx = ItemList.IndexOf(origin);
+        int otherIdx = ItemList.IndexOf(other);
+
+        origin.Rect.DOAnchorPos(other.Rect.anchoredPosition, ProcessSec)
+            .OnStart(() =>
+            {
+                other.Rect.DOAnchorPos(origin.Rect.anchoredPosition, ProcessSec);
+                
+                ItemList.RemoveAt(originIdx);
+                ItemList.Insert(originIdx, other);
+                ItemList.RemoveAt(otherIdx);
+                ItemList.Insert(otherIdx, origin);
+            });
+
+        return new WaitForSeconds(ProcessSec);
+    }
+
+    protected List<ChartItem> SwapItem(ChartItem origin, ChartItem other, List<ChartItem> list)
+    {
+        if (origin == other)
+        {
+            return null;
+        }
+
+        int originIdx = list.IndexOf(origin);
+        int otherIdx = list.IndexOf(other);
+
+        origin.Rect.DOAnchorPos(other.Rect.anchoredPosition, ProcessSec)
+            .OnStart(() =>
+            {
+                other.Rect.DOAnchorPos(origin.Rect.anchoredPosition, ProcessSec);
+            });
+        
+        var temp = list[originIdx];
+        list[originIdx] = other;
+        list[otherIdx] = temp;
+
+        return list;
     }
 
     protected void CancelAllSelect()
@@ -65,21 +122,38 @@ public class SortingBase : MonoBehaviour
         }
     }
 
+    protected void OnSortComplete()
+    {
+        StartCoroutine(OnRightPosition());
+    }
+
+    IEnumerator OnRightPosition()
+    {
+        foreach (var item in ItemList)
+        {
+            item.OnRightPosition();
+            item.PlaySound();
+            item.PointItem();
+            yield return AddWait(ProcessSec);
+        }
+    }
+
     public virtual void Initialize(List<ChartItem> itemList, float speedRate)
     {
         ItemList = itemList;
         SpeedRate = speedRate;
+        ProcessSec = 1 / SpeedRate;
         Steps = 0;
-    }
-    
-    protected WaitForSeconds AddStep(float sec = 0)
-    {
-        Steps++;
-        return new WaitForSeconds(sec == 0 ? 1 / SpeedRate : sec);
     }
     
     protected WaitForSeconds AddWait(float sec)
     {
+        return new WaitForSeconds(sec);
+    }
+
+    protected WaitForSeconds AddStep(float sec)
+    {
+        Steps++;
         return new WaitForSeconds(sec);
     }
 
