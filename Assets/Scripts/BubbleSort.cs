@@ -33,9 +33,11 @@ public class BubbleSort : SortingBase
                 {
                     yield return SwapItem(first, second);
                 }
-                
+
                 CancelAllSelect();
             }
+            
+            ItemList[^(_count)].OnRightPosition();
 
             _count++;
         }

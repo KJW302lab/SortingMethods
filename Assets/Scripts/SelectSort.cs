@@ -40,6 +40,8 @@ public class SelectSort : SortingBase
             if (ItemList[_index] != _minItem)
             {
                 SwapItem(_minItem, ItemList[_index]);
+                
+                _minItem.OnRightPosition();
             }
 
             _index++;
